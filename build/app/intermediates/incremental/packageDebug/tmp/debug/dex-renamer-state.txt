@@ -1,0 +1,4 @@
+#Sun Jul 16 16:12:53 PST 2023
+base.0=/Users/bryan.nivarez/Documents/development/projects/alpha_thrower_version_1/build/app/intermediates/dex/debug/mergeDexDebug/classes.dex
+renamed.0=classes.dex
+path.0=classes.dex
