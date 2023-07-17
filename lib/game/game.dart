@@ -35,8 +35,6 @@ class MyGame extends FlameGame with PanDetector {
 
   late EnemyManager enemyManager;
 
-  // Joystick
-
   @override
   FutureOr<void> onLoad() async {
     //PLAYER

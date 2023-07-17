@@ -1,7 +1,6 @@
 import 'package:alpha_thrower_version_1/game/Pause/PauseButton.dart';
 import 'package:alpha_thrower_version_1/game/Pause/Pause_menu.dart';
 import 'package:alpha_thrower_version_1/game/game.dart';
-import 'package:alpha_thrower_version_1/main.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';

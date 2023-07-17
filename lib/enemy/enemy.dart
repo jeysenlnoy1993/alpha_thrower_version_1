@@ -1,6 +1,11 @@
+import 'dart:math';
+import 'dart:ui';
+
 import 'package:alpha_thrower_version_1/game/game.dart';
 import 'package:alpha_thrower_version_1/player/player.dart';
 import 'package:flame/components.dart';
+import 'package:flame/particles.dart';
+import 'package:flutter/material.dart';
 
 import '../projectile/bullet.dart';
 
@@ -15,6 +20,11 @@ class Enemy extends SpriteAnimationComponent with HasGameRef<MyGame> {
   bool canTakeDamage = true;
   final cooldownDuration = const Duration(seconds: 1);
   Timer? cooldownTimer;
+
+  Random _random = Random();
+  Vector2? getRandomVectorOffset() {
+    return (Vector2.random(_random) - Vector2(0.5, -1)) * 300; //scale factor
+  }
 
   Enemy({
     SpriteAnimation? animation,
@@ -37,6 +47,7 @@ class Enemy extends SpriteAnimationComponent with HasGameRef<MyGame> {
 
   // hit
   void hitToPlayer(Player player) async {
+    gameRef.camera.shake(duration: 0.1, intensity: 5);
     if (!hitChecking) {
       hitChecking = true;
       player.life = player.life - power;
@@ -48,6 +59,18 @@ class Enemy extends SpriteAnimationComponent with HasGameRef<MyGame> {
         await gameRef.gameOver();
       }
     }
+
+    final particleComponent = ParticleSystemComponent(
+        particle: Particle.generate(
+            count: 20,
+            lifespan: 0.5,
+            generator: (i) => AcceleratedParticle(
+                acceleration: getRandomVectorOffset(),
+                speed: getRandomVectorOffset(),
+                position: (position.clone() + Vector2(0, size.y / 3)),
+                child: CircleParticle(
+                    radius: 2, paint: Paint()..color = Colors.orange))));
+    gameRef.add(particleComponent);
   }
 
   void hitByBullet(Bullet bullet) {
@@ -64,5 +87,18 @@ class Enemy extends SpriteAnimationComponent with HasGameRef<MyGame> {
         hitChecking = false;
       });
     }
+
+    // particles effect
+    final particleComponent = ParticleSystemComponent(
+        particle: Particle.generate(
+            count: 20,
+            lifespan: 0.1,
+            generator: (i) => AcceleratedParticle(
+                acceleration: getRandomVectorOffset(),
+                speed: getRandomVectorOffset(),
+                position: (position.clone() + Vector2(0, size.y / 3)),
+                child: CircleParticle(
+                    radius: 2, paint: Paint()..color = Colors.green))));
+    gameRef.add(particleComponent);
   }
 }

@@ -19,7 +19,9 @@ class EnemyManager extends Component with HasGameRef<MyGame> {
 
     if (randPos.y < 0) randPos.y = 0;
 
-    if (randPos.y > gameRef.size.y) randPos.y = gameRef.size.y - enemySize.y;
+    if (randPos.y + enemySize.y > gameRef.size.y) {
+      randPos.y = gameRef.size.y - enemySize.y;
+    }
 
     // ENEMY
     Enemy enemy = Enemy(
