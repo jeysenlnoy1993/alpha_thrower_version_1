@@ -56,9 +56,6 @@ class Enemy extends SpriteAnimationComponent
       player.life = player.life - power;
 
       if (player.life >= 0) {
-        gameRef
-            .findByKey(ComponentKey.named('life${player.life}'))!
-            .removeFromParent();
         gameRef.lifeComponent.text = "X${gameRef.player.life}";
       }
 

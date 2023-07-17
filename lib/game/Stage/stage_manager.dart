@@ -7,26 +7,23 @@ import '../game.dart';
 
 class StageManager extends Component with HasGameRef<MyGame> {
   Random random = Random();
-  int startStage = 0;
-  final int _pointsMultiplier = 5;
+  int stage = 0;
+  final int _pointsMultiplier = 1;
   late Stage currentStage;
 
-  StageManager({required this.startStage}) : super() {
+  StageManager({required this.stage}) : super() {
     currentStage = Stage(
-      level: startStage,
+      level: stage,
     );
-  }
-
-  void taskGenerator() {
-    currentStage.requiredPoints = startStage * _pointsMultiplier;
+    currentStage.requiredPoints = stage * _pointsMultiplier;
     currentStage.task =
         "You are assigned to gather ${currentStage.requiredPoints} magic stones.";
   }
 
   checkTasks() {
-    if (currentStage.requiredPoints == gameRef.player.acquiredPointsPerStage) {
+    if (currentStage.requiredPoints == gameRef.player.collectedPoints) {
       gameRef.pauseEngine();
-      // gameRef.nextLevel();
+      gameRef.nextLevel();
     }
   }
 }

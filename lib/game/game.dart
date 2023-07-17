@@ -7,6 +7,7 @@ import 'package:alpha_thrower_version_1/enemy/enemy.dart';
 import 'package:alpha_thrower_version_1/enemy/enemy_manager.dart';
 import 'package:alpha_thrower_version_1/game/Pause/PauseButton.dart';
 import 'package:alpha_thrower_version_1/game/Pause/Pause_menu.dart';
+import 'package:alpha_thrower_version_1/game/Stage/stage.dart';
 import 'package:alpha_thrower_version_1/game/Stage/stage_manager.dart';
 import 'package:alpha_thrower_version_1/game/game_joystick.dart';
 import 'package:alpha_thrower_version_1/game/gameover/game_over.dart';
@@ -26,10 +27,13 @@ import 'package:flutter/material.dart';
 class MyGame extends FlameGame
     with PanDetector, HasCollisionDetection, CollisionCallbacks {
   int score = 0;
-  int stage = 1;
+  int lastStage = 1;
+
+  // labels
   late TextComponent lifeComponent;
   late TextComponent scoreComponent;
   late TextComponent stageComponent;
+  late TextComponent taskComponent;
 
   Player player = Player();
   late final GameJoystick joystick;
@@ -46,6 +50,7 @@ class MyGame extends FlameGame
   String objectPath = 'objects/task/quest_item_64x64px/';
 
   late SpriteComponent playerLife;
+  late SpriteComponent taskItemLogo;
 
   late EnemyManager enemyManager;
   late StageManager stageManager;
@@ -149,7 +154,7 @@ class MyGame extends FlameGame
     enemyManager = EnemyManager();
 
     // STAGE
-    stageManager = StageManager(startStage: stage);
+    stageManager = StageManager(stage: lastStage);
 
     // MISC
     playerLife = SpriteComponent(
@@ -157,11 +162,21 @@ class MyGame extends FlameGame
         position: Vector2(5, 12),
         size: Vector2(16, 16));
 
+    taskItemLogo = SpriteComponent(
+        sprite: spriteSheetTaskItem.getSpriteById(2),
+        position: Vector2(5, 30),
+        size: Vector2(16, 16));
+
     lifeComponent = TextComponent(
         text: "X${player.life}",
         position: Vector2(25, 10),
         textRenderer: TextPaint(style: TextStyle(fontSize: size.y * 0.04)));
 
+    // Task
+    taskComponent = TextComponent(
+        text: "Quest: 0/0",
+        position: Vector2(25, 30),
+        textRenderer: TextPaint(style: TextStyle(fontSize: size.y * 0.04)));
     // Score
     scoreComponent = TextComponent(
         text: "Score: $score",
@@ -170,15 +185,18 @@ class MyGame extends FlameGame
 
     // level
     stageComponent = TextComponent(
-        text: "Stage: $stage",
-        position: Vector2(30, 45),
+        text: "Stage: ${stageManager.stage}",
+        position: Vector2(size.x - 90, 5),
         textRenderer: TextPaint(style: TextStyle(fontSize: size.y * 0.04)));
 
     // Hit box
     final ShapeHitbox hitbox = RectangleHitbox();
     player.add(hitbox);
 
+    await add(stageComponent);
+    await add(taskItemLogo);
     await add(playerLife);
+    await add(taskComponent);
     await add(lifeComponent);
     await add(scoreComponent);
     await add(enemyManager);
@@ -187,9 +205,18 @@ class MyGame extends FlameGame
     await add(player);
   }
 
+  setTaskItemLabel() {
+    taskComponent.text =
+        'Quest: ${player.collectedPoints}/${stageManager.currentStage.requiredPoints}';
+  }
+
   updateScore(int enemyPoints) {
     score += enemyPoints;
     scoreComponent.text = "Score: $score";
+  }
+
+  updatePlayerLifeComponent() {
+    lifeComponent.text = "X${player.life}";
   }
 
   gameOver() {
@@ -241,8 +268,8 @@ class MyGame extends FlameGame
         TaskObject oneUp = TaskObject(
             animation: object1UpAnimation,
             size: player.size / 2,
-            position: enemy.position,
-            type: lifeStr);
+            position: enemy.position);
+        oneUp.setType(lifeStr);
         final ShapeHitbox hitbox = CircleHitbox();
         oneUp.add(hitbox);
         add(oneUp);
@@ -251,14 +278,16 @@ class MyGame extends FlameGame
         TaskObject taskObject = TaskObject(
             animation: objectTaskAnimation,
             size: player.size / 2,
-            position: enemy.position,
-            type: taskItemStr);
+            position: enemy.position);
+        taskObject.setType(taskItemStr);
         final ShapeHitbox hitbox = CircleHitbox();
         taskObject.add(hitbox);
         add(taskObject);
         break;
     }
   }
+
+  nextLevel() {}
 
   // app life cycle
   @override
@@ -271,7 +300,6 @@ class MyGame extends FlameGame
       case AppLifecycleState.inactive:
         break;
       case AppLifecycleState.paused:
-        print(player.life);
         pauseGame();
         break;
       case AppLifecycleState.detached:

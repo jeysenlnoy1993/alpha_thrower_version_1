@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:alpha_thrower_version_1/enemy/enemy.dart';
 import 'package:alpha_thrower_version_1/game/game.dart';
+import 'package:alpha_thrower_version_1/powerups/task_object.dart';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 
@@ -11,10 +12,9 @@ class Player extends SpriteAnimationComponent
   Vector2 moveDirection = Vector2.zero();
   double speed = 180;
   int life = 3;
+  int collectedPoints = 0;
 
   late final JoystickComponent joyStick;
-
-  int acquiredPointsPerStage = 0;
 
   Player({
     SpriteAnimation? animation,
@@ -85,6 +85,22 @@ class Player extends SpriteAnimationComponent
       if (other.shouldRemove) return;
       if (other.hitChecking) return;
       other.hitToPlayer(this);
+    }
+
+    if (other is TaskObject) {
+      if (other.type == MyGame.lifeStr) {
+        life++;
+        gameRef.updatePlayerLifeComponent();
+      }
+
+      if (other.type == MyGame.taskItemStr) {
+        collectedPoints++;
+        gameRef.setTaskItemLabel();
+        gameRef.remove(other);
+        Future.delayed(Duration(milliseconds: 499), () {
+          gameRef.stageManager.checkTasks();
+        });
+      }
     }
   }
 }

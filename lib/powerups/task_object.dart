@@ -20,20 +20,10 @@ class TaskObject extends SpriteAnimationComponent
     SpriteAnimation? animation,
     Vector2? size,
     Vector2? position,
-    required String type,
   }) : super(animation: animation, size: size, position: position);
 
-  @override
-  void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
-    super.onCollision(intersectionPoints, other);
-    if (other is Player) {
-      if (type == MyGame.lifeStr) {
-        gameRef.player.life++;
-        gameRef.lifeComponent.text = "X${gameRef.player.life}";
-      }
-
-      gameRef.remove(this);
-    }
+  setType(newType) {
+    type = newType;
   }
 
   @override
