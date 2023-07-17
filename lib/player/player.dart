@@ -1,9 +1,15 @@
+import 'dart:async';
+import 'dart:ui';
+
+import 'package:alpha_thrower_version_1/enemy/enemy.dart';
 import 'package:alpha_thrower_version_1/game/game.dart';
+import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 
-class Player extends SpriteAnimationComponent with HasGameRef<MyGame> {
+class Player extends SpriteAnimationComponent
+    with HasGameRef<MyGame>, CollisionCallbacks {
   Vector2 moveDirection = Vector2.zero();
-  double speed = 350;
+  double speed = 180;
   int life = 3;
 
   late final JoystickComponent joyStick;
@@ -68,5 +74,17 @@ class Player extends SpriteAnimationComponent with HasGameRef<MyGame> {
 
   addJoystickComponent(JoystickComponent newJoyStick) {
     joyStick = newJoyStick;
+  }
+
+  @override
+  void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
+    super.onCollision(intersectionPoints, other);
+    if (other is Enemy) {
+      if (other.shouldRemove) return;
+      if (other.hitChecking) return;
+      if (other.containsPoint(absoluteCenter)) {
+        other.hitToPlayer(this);
+      }
+    }
   }
 }

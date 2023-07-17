@@ -1,8 +1,14 @@
+import 'dart:ui';
+
 import 'package:alpha_thrower_version_1/game/game.dart';
+import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 
-class Bullet extends SpriteAnimationComponent with HasGameRef<MyGame> {
-  final speed = 400;
+import '../enemy/enemy.dart';
+
+class Bullet extends SpriteAnimationComponent
+    with HasGameRef<MyGame>, CollisionCallbacks {
+  final speed = 200;
   bool shouldRemove = false;
 
   int power = 1;

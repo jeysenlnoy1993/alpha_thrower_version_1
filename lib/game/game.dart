@@ -4,9 +4,13 @@ import 'dart:async';
 
 import 'package:alpha_thrower_version_1/enemy/enemy.dart';
 import 'package:alpha_thrower_version_1/enemy/enemy_manager.dart';
+import 'package:alpha_thrower_version_1/game/Pause/PauseButton.dart';
+import 'package:alpha_thrower_version_1/game/Pause/Pause_menu.dart';
 import 'package:alpha_thrower_version_1/game/game_joystick.dart';
+import 'package:alpha_thrower_version_1/game/gameover/game_over.dart';
 import 'package:alpha_thrower_version_1/player/player.dart';
 import 'package:alpha_thrower_version_1/projectile/bullet.dart';
+import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/game.dart';
@@ -16,7 +20,8 @@ import 'package:flame/text.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
-class MyGame extends FlameGame with PanDetector {
+class MyGame extends FlameGame
+    with PanDetector, HasCollisionDetection, CollisionCallbacks {
   int score = 0;
   late TextComponent scoreComponent;
 
@@ -119,14 +124,14 @@ class MyGame extends FlameGame with PanDetector {
         position: Vector2(size.x, 45),
         textRenderer: TextPaint(style: TextStyle(fontSize: size.y * 0.04)));
     scoreComponent.position.x = size.x - scoreComponent.x;
-    add(scoreComponent);
+    final ShapeHitbox hitbox = RectangleHitbox();
+    player.add(hitbox);
 
-    add(enemyManager);
+    await add(scoreComponent);
+    await add(enemyManager);
     await add(flipButton);
     await add(joystick);
     await add(player);
-
-    return super.onLoad();
   }
 
   updateScore(int enemyPoints) {
@@ -136,8 +141,12 @@ class MyGame extends FlameGame with PanDetector {
   }
 
   gameOver() {
-    print('game over');
-    pauseEngine();
+    overlays.remove(PauseButton.iD);
+    overlays.remove(PauseMenu.iD);
+    overlays.add(GameOverMenu.iD);
+    Future.delayed(Duration(milliseconds: 500), () {
+      pauseEngine();
+    });
   }
 
   shoot() async {
@@ -151,31 +160,35 @@ class MyGame extends FlameGame with PanDetector {
       size: bulletSize,
       position: bulletStartPosition,
     );
+    final ShapeHitbox hitbox = CircleHitbox();
+    bullet.add(hitbox);
     add(bullet);
   }
 
+  pauseGame() {
+    if (player.life <= 0) return;
+    pauseEngine();
+    overlays.add(PauseMenu.iD);
+  }
+
+  // app life cycle
   @override
-  void update(double dt) {
-    super.update(dt);
-    // look for all bullets
-    final bullets = children.whereType<Bullet>();
-    for (var enemy in children.whereType<Enemy>()) {
-      if (enemy.shouldRemove) continue;
+  void lifecycleStateChange(AppLifecycleState state) {
+    super.lifecycleStateChange(state);
 
-      if (enemy.hitChecking) continue;
-      if (enemy.containsPoint(player.absoluteCenter)) {
-        enemy.hitToPlayer(player);
+    switch (state) {
+      case AppLifecycleState.resumed:
         break;
-      }
+      case AppLifecycleState.inactive:
+        break;
+      case AppLifecycleState.paused:
+        print(player.life);
+        pauseGame();
+        break;
+      case AppLifecycleState.detached:
+        pauseGame();
 
-      for (var bullet in bullets) {
-        if (bullet.shouldRemove) continue;
-        if (enemy.hitChecking) continue;
-        if (enemy.containsPoint(bullet.absoluteCenter)) {
-          enemy.hitByBullet(bullet);
-          break;
-        }
-      }
+        break;
     }
   }
 }

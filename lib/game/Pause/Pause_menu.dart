@@ -48,7 +48,9 @@ class PauseMenu extends StatelessWidget {
             child: FlipInY(
               delay: const Duration(milliseconds: 1300),
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.pop(context);
+                },
                 child: Text("Main Menu"),
               ),
             ),

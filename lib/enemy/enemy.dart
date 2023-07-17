@@ -3,17 +3,19 @@ import 'dart:ui';
 
 import 'package:alpha_thrower_version_1/game/game.dart';
 import 'package:alpha_thrower_version_1/player/player.dart';
+import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/particles.dart';
 import 'package:flutter/material.dart';
 
 import '../projectile/bullet.dart';
 
-class Enemy extends SpriteAnimationComponent with HasGameRef<MyGame> {
-  double speed = 250;
+class Enemy extends SpriteAnimationComponent
+    with HasGameRef<MyGame>, CollisionCallbacks {
+  double speed = 150;
   int scoreWhenKilled = 100;
   bool shouldRemove = false;
-  int life = 3;
+  int life = 1;
   bool hitChecking = false;
   int power = 1;
 
@@ -52,11 +54,15 @@ class Enemy extends SpriteAnimationComponent with HasGameRef<MyGame> {
       hitChecking = true;
       player.life = player.life - power;
 
-      gameRef
-          .findByKey(ComponentKey.named('life${player.life}'))!
-          .removeFromParent();
+      if (player.life >= 0) {
+        gameRef
+            .findByKey(ComponentKey.named('life${player.life}'))!
+            .removeFromParent();
+      }
+
       if (player.life <= 0) {
         await gameRef.gameOver();
+        return;
       }
     }
 
@@ -83,7 +89,7 @@ class Enemy extends SpriteAnimationComponent with HasGameRef<MyGame> {
       if (life <= 0) {
         gameRef.remove(this);
       }
-      Future.delayed(const Duration(milliseconds: 200), () {
+      Future.delayed(const Duration(milliseconds: 100), () {
         hitChecking = false;
       });
     }
@@ -100,5 +106,16 @@ class Enemy extends SpriteAnimationComponent with HasGameRef<MyGame> {
                 child: CircleParticle(
                     radius: 2, paint: Paint()..color = Colors.green))));
     gameRef.add(particleComponent);
+  }
+
+  @override
+  void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
+    super.onCollision(intersectionPoints, other);
+    if (other is Player) {
+    } else if (other is Bullet) {
+      if (shouldRemove) return;
+      if (hitChecking) return;
+      hitByBullet(other);
+    }
   }
 }
