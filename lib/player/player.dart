@@ -14,6 +14,8 @@ class Player extends SpriteAnimationComponent
 
   late final JoystickComponent joyStick;
 
+  int acquiredPointsPerStage = 0;
+
   Player({
     SpriteAnimation? animation,
     Vector2? size,
@@ -82,9 +84,7 @@ class Player extends SpriteAnimationComponent
     if (other is Enemy) {
       if (other.shouldRemove) return;
       if (other.hitChecking) return;
-      if (other.containsPoint(absoluteCenter)) {
-        other.hitToPlayer(this);
-      }
+      other.hitToPlayer(this);
     }
   }
 }

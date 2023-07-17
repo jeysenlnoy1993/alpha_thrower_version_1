@@ -68,6 +68,7 @@ flutter:
     - assets/images/player/
     - assets/images/buttons/
     - assets/images/projectiles/
+    - assets/images/objects/task/quest_item_64x64px/
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

@@ -13,7 +13,7 @@ import '../projectile/bullet.dart';
 class Enemy extends SpriteAnimationComponent
     with HasGameRef<MyGame>, CollisionCallbacks {
   double speed = 150;
-  int scoreWhenKilled = 100;
+  int scoreWhenKilled = 5;
   bool shouldRemove = false;
   int life = 1;
   bool hitChecking = false;
@@ -49,6 +49,7 @@ class Enemy extends SpriteAnimationComponent
 
   // hit
   void hitToPlayer(Player player) async {
+    // ignore: deprecated_member_use
     gameRef.camera.shake(duration: 0.1, intensity: 5);
     if (!hitChecking) {
       hitChecking = true;
@@ -58,6 +59,7 @@ class Enemy extends SpriteAnimationComponent
         gameRef
             .findByKey(ComponentKey.named('life${player.life}'))!
             .removeFromParent();
+        gameRef.lifeComponent.text = "X${gameRef.player.life}";
       }
 
       if (player.life <= 0) {
@@ -84,9 +86,11 @@ class Enemy extends SpriteAnimationComponent
     if (!hitChecking) {
       hitChecking = true;
       life = life - bullet.power;
+
       gameRef.updateScore(scoreWhenKilled);
 
       if (life <= 0) {
+        gameRef.createPowerUps(this);
         gameRef.remove(this);
       }
       Future.delayed(const Duration(milliseconds: 100), () {

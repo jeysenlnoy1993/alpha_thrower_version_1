@@ -28,7 +28,6 @@ class Bullet extends SpriteAnimationComponent
 
   @override
   void onRemove() {
-    // TODO: implement onRemove
     super.onRemove();
     shouldRemove = true;
   }
