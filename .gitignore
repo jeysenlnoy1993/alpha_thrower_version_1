@@ -63,6 +63,9 @@ flutter_*.png
 linked_*.ds
 unlinked.ds
 unlinked_spec.ds
+.flutter-plugins-dependencies
+.dart_tool/
+build/app/outputs/
 
 # Android related
 **/android/**/gradle-wrapper.jar
