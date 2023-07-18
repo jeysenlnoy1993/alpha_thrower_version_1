@@ -96,9 +96,12 @@ class Player extends SpriteAnimationComponent
       if (other.type == MyGame.taskItemStr) {
         collectedPoints++;
         gameRef.setTaskItemLabel();
-        gameRef.remove(other);
-        Future.delayed(Duration(milliseconds: 499), () {
-          gameRef.stageManager.checkTasks();
+      }
+      gameRef.remove(other);
+
+      if (other.type == MyGame.taskItemStr) {
+        Future.delayed(const Duration(milliseconds: 200), () {
+          gameRef.checkLevel();
         });
       }
     }

@@ -9,6 +9,7 @@ import 'package:alpha_thrower_version_1/game/Pause/PauseButton.dart';
 import 'package:alpha_thrower_version_1/game/Pause/Pause_menu.dart';
 import 'package:alpha_thrower_version_1/game/Stage/stage.dart';
 import 'package:alpha_thrower_version_1/game/Stage/stage_manager.dart';
+import 'package:alpha_thrower_version_1/game/Stage/stage_menu.dart';
 import 'package:alpha_thrower_version_1/game/game_joystick.dart';
 import 'package:alpha_thrower_version_1/game/gameover/game_over.dart';
 import 'package:alpha_thrower_version_1/player/player.dart';
@@ -37,11 +38,16 @@ class MyGame extends FlameGame
 
   Player player = Player();
   late final GameJoystick joystick;
+
+  // ANIMATION
   late SpriteAnimation spaPlayer1;
   late SpriteAnimation bulletAnimation;
   late SpriteAnimation objectTaskAnimation;
   late SpriteAnimation object1UpAnimation;
-  late SpriteAnimation enemyAnimation;
+
+  // SPRITE SHEET
+  late SpriteSheet spriteSheetEnemy;
+
   String player1Path = 'player/player1.png';
   String playerLifePath = 'player/heart.png';
   String enemy1Path = 'enemy/enemy1.png';
@@ -54,6 +60,7 @@ class MyGame extends FlameGame
 
   late EnemyManager enemyManager;
   late StageManager stageManager;
+  ComponentSet components = ComponentSet();
 
   static const String lifeStr = '1UP';
   static const String taskItemStr = 'TASKITEM';
@@ -89,7 +96,7 @@ class MyGame extends FlameGame
       srcSize: Vector2(40, 40),
     );
     // ENEMY
-    final spriteSheetEnemy = SpriteSheet(
+    spriteSheetEnemy = SpriteSheet(
       image: await images.load(enemy1Path),
       srcSize: Vector2(233, 120),
     );
@@ -109,8 +116,6 @@ class MyGame extends FlameGame
         row: 0, stepTime: 0.1, from: 3, to: 9, loop: true);
     bulletAnimation = spriteSheetBullet.createAnimation(
         row: 0, stepTime: 0.2, from: 0, to: 5);
-    enemyAnimation = spriteSheetEnemy.createAnimation(
-        row: 0, stepTime: 0.1, from: 0, to: 3, loop: true);
 
     objectTaskAnimation = spriteSheetTaskItem.createAnimation(
         row: 0, stepTime: 0.1, from: 0, to: 5);
@@ -156,6 +161,8 @@ class MyGame extends FlameGame
     // STAGE
     stageManager = StageManager(stage: lastStage);
 
+    showStageMenu();
+
     // MISC
     playerLife = SpriteComponent(
         sprite: spriteSheetLife.getSpriteById(0),
@@ -177,6 +184,7 @@ class MyGame extends FlameGame
         text: "Quest: 0/0",
         position: Vector2(25, 30),
         textRenderer: TextPaint(style: TextStyle(fontSize: size.y * 0.04)));
+    setTaskItemLabel();
     // Score
     scoreComponent = TextComponent(
         text: "Score: $score",
@@ -188,7 +196,7 @@ class MyGame extends FlameGame
         text: "Stage: ${stageManager.stage}",
         position: Vector2(size.x - 90, 5),
         textRenderer: TextPaint(style: TextStyle(fontSize: size.y * 0.04)));
-
+    setStageLabel();
     // Hit box
     final ShapeHitbox hitbox = RectangleHitbox();
     player.add(hitbox);
@@ -205,9 +213,18 @@ class MyGame extends FlameGame
     await add(player);
   }
 
+  restartGame() {
+    resumeEngine();
+    enemyManager.timer.start();
+  }
+
   setTaskItemLabel() {
     taskComponent.text =
         'Quest: ${player.collectedPoints}/${stageManager.currentStage.requiredPoints}';
+  }
+
+  setStageLabel() {
+    stageComponent.text = "Stage: ${stageManager.stage}";
   }
 
   updateScore(int enemyPoints) {
@@ -217,6 +234,27 @@ class MyGame extends FlameGame
 
   updatePlayerLifeComponent() {
     lifeComponent.text = "X${player.life}";
+  }
+
+  showStageMenu() {
+    pauseEngine();
+    overlays.remove(PauseButton.iD);
+    overlays.add(StageMenu.iD);
+  }
+
+  nextLevel() {
+    enemyManager.timer.pause();
+    for (var en in children.whereType<Enemy>()) {
+      en.removeFromParent();
+    }
+
+    stageManager.nextStage();
+    player.collectedPoints = 0;
+    setTaskItemLabel();
+    setStageLabel();
+
+    overlays.remove(PauseButton.iD);
+    overlays.add(StageMenu.iD);
   }
 
   gameOver() {
@@ -287,7 +325,11 @@ class MyGame extends FlameGame
     }
   }
 
-  nextLevel() {}
+  checkLevel() {
+    if (stageManager.currentStage.requiredPoints == player.collectedPoints) {
+      nextLevel();
+    }
+  }
 
   // app life cycle
   @override

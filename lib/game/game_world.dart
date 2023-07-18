@@ -6,6 +6,8 @@ import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
+import 'Stage/stage_menu.dart';
+
 class GameScreen extends StatelessWidget {
   final game = MyGame();
   @override
@@ -26,6 +28,9 @@ class GameScreen extends StatelessWidget {
                   ),
               GameOverMenu.iD: (BuildContext context, MyGame gameRef) =>
                   GameOverMenu(
+                    gameRef: gameRef,
+                  ),
+              StageMenu.iD: (BuildContext context, MyGame gameRef) => StageMenu(
                     gameRef: gameRef,
                   ),
             }, game: game)));

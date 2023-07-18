@@ -8,6 +8,12 @@
       "languageVersion": "2.12"
     },
     {
+      "name": "animated_text_kit",
+      "rootUri": "file:///Users/bryan.nivarez/.pub-cache/hosted/pub.dev/animated_text_kit-4.2.2",
+      "packageUri": "lib/",
+      "languageVersion": "2.17"
+    },
+    {
       "name": "archive",
       "rootUri": "file:///Users/bryan.nivarez/.pub-cache/hosted/pub.dev/archive-3.3.7",
       "packageUri": "lib/",
@@ -410,7 +416,7 @@
       "languageVersion": "3.0"
     }
   ],
-  "generated": "2023-07-17T06:53:44.171255Z",
+  "generated": "2023-07-18T01:22:33.714160Z",
   "generator": "pub",
   "generatorVersion": "3.0.5"
 }
