@@ -9,10 +9,11 @@ import 'enemy.dart';
 
 class EnemyManager extends Component with HasGameRef<MyGame> {
   late Timer timer;
+  final double lifeMultiplier = 0.5;
   late SpriteAnimation enemyAnimation;
   Random random = Random();
   EnemyManager() : super() {
-    timer = Timer(1, onTick: _spawnEnemy, repeat: true);
+    timer = Timer(1.5, onTick: _spawnEnemy, repeat: true);
   }
 
   void _spawnEnemy() {
@@ -25,37 +26,107 @@ class EnemyManager extends Component with HasGameRef<MyGame> {
         'level': 1,
         'animation_from': 0,
         'animation_to': 3,
-        'life': 1,
+        'life': 3,
         'power': 1,
-        'speed': 150.00,
+        'speed': 50.00,
+        'size': enemySize * 0.8,
+      },
+      {
+        'level': 1,
+        'animation_from': 0,
+        'animation_to': 3,
+        'life': 3,
+        'power': 1,
+        'speed': 100.00,
+        'size': enemySize * 1.1,
+      },
+
+      {
+        'level': 2,
+        'animation_from': 0,
+        'animation_to': 3,
+        'life': 3,
+        'power': 1,
+        'speed': 80.00,
         'size': enemySize,
+      },
+
+      {
+        'level': 2,
+        'animation_from': 0,
+        'animation_to': 3,
+        'life': 3,
+        'power': 1,
+        'speed': 120.00,
+        'size': enemySize,
+      },
+      // red
+      {
+        'level': 2,
+        'animation_from': 4,
+        'animation_to': 7,
+        'life': 4,
+        'power': 1,
+        'speed': 80.00,
+        'size': enemySize * 1.2,
       },
       {
         'level': 2,
         'animation_from': 4,
         'animation_to': 7,
-        'life': 2,
+        'life': 4,
         'power': 1,
-        'speed': 180.00,
+        'speed': 120.00,
         'size': enemySize * 1.2,
       },
       {
         'level': 3,
+        'animation_from': 4,
+        'animation_to': 7,
+        'life': 5,
+        'power': 1,
+        'speed': 150.00,
+        'size': enemySize * 1.2,
+      },
+      // big enemy level 1 slow
+      {
+        'level': 3,
         'animation_from': 0,
         'animation_to': 3,
-        'life': 4,
-        'power': 2,
+        'life': 10,
+        'power': 10,
         'speed': 50.00,
-        'size': enemySize * 3,
+        'size': enemySize * 2.5,
       },
+      //small fast
+      {
+        'level': 3,
+        'animation_from': 0,
+        'animation_to': 3,
+        'life': 2,
+        'power': 4,
+        'speed': 240.00,
+        'size': enemySize * 0.5,
+      },
+      // fast red
       {
         'level': 4,
         'animation_from': 4,
         'animation_to': 7,
-        'life': 4,
+        'life': 2,
         'power': 4,
-        'speed': 300.00,
-        'size': enemySize * 1.8,
+        'speed': 240.00,
+        'size': enemySize,
+      },
+      // fast red
+      {
+        'level': 4,
+        'animation_from': 4,
+        'animation_to': 7,
+        'life': 2,
+        'power': 4,
+        'speed': 340.00,
+        'size': enemySize * 0.5,
       },
     ];
 
@@ -86,7 +157,11 @@ class EnemyManager extends Component with HasGameRef<MyGame> {
     );
 
     // set enemy property
-    enemy.life = enemyMap['life'];
+    double mul = (stage * lifeMultiplier).roundToDouble();
+    if (mul <= 0) {
+      mul = 1;
+    }
+    enemy.life = (enemyMap['life'] * mul).round();
     enemy.speed = enemyMap['speed'];
     enemy.power = enemyMap['power'];
     enemy.size = enemyMap['size'];

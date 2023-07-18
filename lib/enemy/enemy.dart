@@ -38,6 +38,17 @@ class Enemy extends SpriteAnimationComponent
   void update(double dt) {
     super.update(dt);
     position += Vector2(-1, 0) * speed * dt;
+
+    if (gameRef.stageManager.stage > 3) {
+      if (position.x < gameRef.size.x / 3) {
+        if (position.y < gameRef.size.y / 2) {
+          position.y++;
+        } else {
+          position.y--;
+        }
+      }
+    }
+
     if (x <= 0) gameRef.remove(this);
   }
 

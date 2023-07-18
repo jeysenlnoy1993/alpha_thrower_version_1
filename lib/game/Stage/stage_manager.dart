@@ -8,7 +8,7 @@ import '../game.dart';
 class StageManager extends Component with HasGameRef<MyGame> {
   Random random = Random();
   int stage = 1;
-  int _pointsMultiplier = 1;
+  final int _pointsMultiplier = 5;
   late Stage currentStage;
 
   StageManager({required this.stage}) : super() {

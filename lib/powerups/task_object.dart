@@ -14,7 +14,6 @@ class TaskObject extends SpriteAnimationComponent
   String type = '';
 
   late final JoystickComponent joyStick;
-  int acquiredPointsPerStage = 0;
 
   TaskObject({
     SpriteAnimation? animation,
