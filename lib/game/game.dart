@@ -53,6 +53,7 @@ class MyGame extends FlameGame
   String enemy1Path = 'enemy/enemy1.png';
   String buttonPath = 'buttons/buttons.png';
   String bulletPath = 'projectiles/bullet.png';
+  String bulletBackFirePath = 'projectiles/projectilebackfire.png';
   String objectPath = 'objects/task/quest_item_64x64px/';
 
   late SpriteComponent playerLife;
@@ -71,8 +72,8 @@ class MyGame extends FlameGame
   FutureOr<void> onLoad() async {
     // POWER UPS
     powerUpList.addAll([
-      StageItem(lifeStr, 0.5),
-      StageItem(taskItemStr, 0.5),
+      StageItem(lifeStr, 0.1),
+      StageItem(taskItemStr, 0.3),
     ]);
 
     //PLAYER
@@ -136,23 +137,30 @@ class MyGame extends FlameGame
     // A button with margin from the edge of the viewport that flips the
     // rendering of the player on the X-axis.
     final flipButton = HudButtonComponent(
-      button: SpriteComponent(
-        sprite: spriteSheetButton.getSpriteById(0),
-        size: Vector2.all(80),
-      ),
-      buttonDown: SpriteComponent(
-        sprite: spriteSheetButton.getSpriteById(0),
-        size: Vector2.all(70),
-      ),
-      margin: const EdgeInsets.only(
-        right: 80,
-        bottom: 60,
-      ),
-      // onPressed: player.flipHorizontally,
-      onPressed: () {
-        shoot();
-      },
-    );
+        button: SpriteComponent(
+          sprite: spriteSheetButton.getSpriteById(0),
+          size: Vector2.all(80),
+        ),
+        buttonDown: SpriteComponent(
+          sprite: spriteSheetButton.getSpriteById(0),
+          size: Vector2.all(70),
+        ),
+        margin: const EdgeInsets.only(
+          right: 80,
+          bottom: 60,
+        ),
+        // onPressed: player.flipHorizontally,
+        onPressed: () async {
+          player.animation = SpriteSheet(
+            image: await images.load(bulletBackFirePath),
+            srcSize: Vector2(40, 40),
+          ).createAnimation(row: 0, stepTime: 0.1, from: 0, to: 2, loop: true);
+        },
+        onReleased: () {
+          player.animation = spriteSheet.createAnimation(
+              row: 0, stepTime: 0.1, from: 3, to: 9, loop: true);
+          shoot();
+        });
 
     // Game Manager
     // ENEMY
@@ -279,7 +287,28 @@ class MyGame extends FlameGame
     );
     final ShapeHitbox hitbox = CircleHitbox();
     bullet.add(hitbox);
-    add(bullet);
+    await add(bullet);
+
+    // Bullet bullet2 = Bullet(
+    //   animation: bulletAnimation,
+    //   size: bulletSize * 1.4,
+    //   position: bulletStartPosition,
+    // );
+
+    // bullet2.position.y = player.position.y + 30;
+    // final ShapeHitbox hitbox2 = CircleHitbox();
+    // bullet2.add(hitbox2);
+    // await add(bullet2);
+
+    // Bullet bullet3 = Bullet(
+    //   animation: bulletAnimation,
+    //   size: bulletSize * 1.4,
+    //   position: bulletStartPosition,
+    // );
+    // final ShapeHitbox hitbox3 = CircleHitbox();
+    // bullet3.position.y = player.position.y - 5;
+    // bullet3.add(hitbox3);
+    // await add(bullet3);
   }
 
   pauseGame() {

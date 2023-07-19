@@ -9,7 +9,6 @@ import 'package:flame/components.dart';
 
 class Player extends SpriteAnimationComponent
     with HasGameRef<MyGame>, CollisionCallbacks {
-  Vector2 moveDirection = Vector2.zero();
   double speed = 180;
   int life = 3;
   int collectedPoints = 0;

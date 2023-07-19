@@ -91,20 +91,27 @@ class Enemy extends SpriteAnimationComponent
 
   void hitByBullet(Bullet bullet) {
     gameRef.remove(bullet);
-    if (!hitChecking) {
-      hitChecking = true;
-      life = life - bullet.power;
+    life = life - bullet.power;
+    gameRef.updateScore(scoreWhenKilled);
 
-      gameRef.updateScore(scoreWhenKilled);
-
-      if (life <= 0) {
-        gameRef.createPowerUps(this);
-        gameRef.remove(this);
-      }
-      Future.delayed(const Duration(milliseconds: 100), () {
-        hitChecking = false;
-      });
+    if (life <= 0) {
+      gameRef.createPowerUps(this);
+      gameRef.remove(this);
     }
+    // if (!hitChecking) {
+    //   hitChecking = true;
+    //   life = life - bullet.power;
+
+    //   gameRef.updateScore(scoreWhenKilled);
+
+    //   if (life <= 0) {
+    //     gameRef.createPowerUps(this);
+    //     gameRef.remove(this);
+    //   }
+    //   Future.delayed(const Duration(milliseconds: 100), () {
+    //     hitChecking = false;
+    //   });
+    // }
 
     // particles effect
     final particleComponent = ParticleSystemComponent(
@@ -125,8 +132,6 @@ class Enemy extends SpriteAnimationComponent
     super.onCollision(intersectionPoints, other);
     if (other is Player) {
     } else if (other is Bullet) {
-      if (shouldRemove) return;
-      if (hitChecking) return;
       hitByBullet(other);
     }
   }
