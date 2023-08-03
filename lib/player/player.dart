@@ -12,6 +12,7 @@ class Player extends SpriteAnimationComponent
   double speed = 180;
   int life = 3;
   int collectedPoints = 0;
+  int firePower = 1;
 
   late final JoystickComponent joyStick;
 
@@ -90,6 +91,10 @@ class Player extends SpriteAnimationComponent
       if (other.type == MyGame.lifeStr) {
         life++;
         gameRef.updatePlayerLifeComponent();
+      }
+
+      if (other.type == MyGame.firePowerStr) {
+        firePower++;
       }
 
       if (other.type == MyGame.taskItemStr) {

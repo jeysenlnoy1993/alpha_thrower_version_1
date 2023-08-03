@@ -14,6 +14,7 @@ import 'package:alpha_thrower_version_1/game/game_joystick.dart';
 import 'package:alpha_thrower_version_1/game/gameover/game_over.dart';
 import 'package:alpha_thrower_version_1/player/player.dart';
 import 'package:alpha_thrower_version_1/powerups/task_object.dart';
+import 'package:alpha_thrower_version_1/projectile/backfire.dart';
 import 'package:alpha_thrower_version_1/projectile/bullet.dart';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
@@ -38,6 +39,7 @@ class MyGame extends FlameGame
 
   Player player = Player();
   late final GameJoystick joystick;
+  late BackFire backFire;
 
   // ANIMATION
   late SpriteAnimation spaPlayer1;
@@ -65,6 +67,7 @@ class MyGame extends FlameGame
 
   static const String lifeStr = '1UP';
   static const String taskItemStr = 'TASKITEM';
+  static const String firePowerStr = 'FIREPOWER';
 
   List<StageItem> powerUpList = [];
 
@@ -72,8 +75,9 @@ class MyGame extends FlameGame
   FutureOr<void> onLoad() async {
     // POWER UPS
     powerUpList.addAll([
-      StageItem(lifeStr, 0.1),
-      StageItem(taskItemStr, 0.3),
+      // StageItem(lifeStr, 0.1),
+      // StageItem(taskItemStr, 0.3),
+      StageItem(firePowerStr, 1.0),
     ]);
 
     //PLAYER
@@ -96,6 +100,7 @@ class MyGame extends FlameGame
       image: await images.load(bulletPath),
       srcSize: Vector2(40, 40),
     );
+
     // ENEMY
     spriteSheetEnemy = SpriteSheet(
       image: await images.load(enemy1Path),
@@ -151,15 +156,29 @@ class MyGame extends FlameGame
         ),
         // onPressed: player.flipHorizontally,
         onPressed: () async {
-          player.animation = SpriteSheet(
-            image: await images.load(bulletBackFirePath),
-            srcSize: Vector2(40, 40),
-          ).createAnimation(row: 0, stepTime: 0.1, from: 0, to: 2, loop: true);
+          backFire = BackFire(
+            animation: SpriteSheet(
+              image: await images.load(bulletBackFirePath),
+              srcSize: Vector2(40, 40),
+            ).createAnimation(
+                row: 0, stepTime: 0.1, from: 0, to: 2, loop: true),
+          );
+
+          backFire.size = Vector2(20, 20);
+
+          backFire.position = player.position;
+          backFire.position.x = player.position.x + (player.size.x) - 18;
+          backFire.position.y = backFire.position.y + 10;
+
+          add(backFire);
+          Future.delayed(const Duration(milliseconds: 300), () {
+            for (var en in children.whereType<BackFire>()) {
+              en.removeFromParent();
+            }
+          });
         },
-        onReleased: () {
-          player.animation = spriteSheet.createAnimation(
-              row: 0, stepTime: 0.1, from: 3, to: 9, loop: true);
-          shoot();
+        onReleased: () async {
+          await shoot();
         });
 
     // Game Manager
@@ -280,35 +299,71 @@ class MyGame extends FlameGame
     final bulletStartPosition = Vector2(playerCenterX - bulletSize.x / 2,
         player.position.y + player.size.y / 2 - bulletSize.y / 2);
 
-    Bullet bullet = Bullet(
-      animation: bulletAnimation,
-      size: bulletSize,
-      position: bulletStartPosition,
-    );
-    final ShapeHitbox hitbox = CircleHitbox();
-    bullet.add(hitbox);
-    await add(bullet);
+    if (player.firePower == 1) {
+      Bullet bullet = Bullet(
+        animation: bulletAnimation,
+        size: bulletSize,
+        position: bulletStartPosition,
+      );
+      final ShapeHitbox hitbox = CircleHitbox();
+      bullet.add(hitbox);
+      await add(bullet);
+    }
 
-    // Bullet bullet2 = Bullet(
-    //   animation: bulletAnimation,
-    //   size: bulletSize * 1.4,
-    //   position: bulletStartPosition,
-    // );
+    if (player.firePower == 2) {
+      Bullet bullet2 = Bullet(
+        animation: bulletAnimation,
+        size: bulletSize * 1.4,
+        position: bulletStartPosition,
+      );
 
-    // bullet2.position.y = player.position.y + 30;
-    // final ShapeHitbox hitbox2 = CircleHitbox();
-    // bullet2.add(hitbox2);
-    // await add(bullet2);
+      bullet2.position.y = player.position.y + 30;
+      final ShapeHitbox hitbox2 = CircleHitbox();
+      bullet2.add(hitbox2);
+      await add(bullet2);
 
-    // Bullet bullet3 = Bullet(
-    //   animation: bulletAnimation,
-    //   size: bulletSize * 1.4,
-    //   position: bulletStartPosition,
-    // );
-    // final ShapeHitbox hitbox3 = CircleHitbox();
-    // bullet3.position.y = player.position.y - 5;
-    // bullet3.add(hitbox3);
-    // await add(bullet3);
+      Bullet bullet3 = Bullet(
+        animation: bulletAnimation,
+        size: bulletSize * 1.4,
+        position: bulletStartPosition,
+      );
+      final ShapeHitbox hitbox3 = CircleHitbox();
+      bullet3.position.y = player.position.y - 5;
+      bullet3.add(hitbox3);
+      await add(bullet3);
+    }
+
+    if (player.firePower >= 3) {
+      Bullet bullet = Bullet(
+        animation: bulletAnimation,
+        size: bulletSize,
+        position: bulletStartPosition,
+      );
+      final ShapeHitbox hitbox = CircleHitbox();
+      bullet.add(hitbox);
+      await add(bullet);
+
+      Bullet bullet2 = Bullet(
+        animation: bulletAnimation,
+        size: bulletSize * 1.4,
+        position: bulletStartPosition,
+      );
+
+      bullet2.position.y = player.position.y + 30;
+      final ShapeHitbox hitbox2 = CircleHitbox();
+      bullet2.add(hitbox2);
+      await add(bullet2);
+
+      Bullet bullet3 = Bullet(
+        animation: bulletAnimation,
+        size: bulletSize * 1.4,
+        position: bulletStartPosition,
+      );
+      final ShapeHitbox hitbox3 = CircleHitbox();
+      bullet3.position.y = player.position.y - 5;
+      bullet3.add(hitbox3);
+      await add(bullet3);
+    }
   }
 
   pauseGame() {
@@ -331,6 +386,16 @@ class MyGame extends FlameGame
     if (!createInstance) return;
 
     switch (ups.name) {
+      case firePowerStr:
+        TaskObject firePower = TaskObject(
+            animation: object1UpAnimation,
+            size: player.size / 2,
+            position: enemy.position);
+        firePower.setType(firePowerStr);
+        final ShapeHitbox hitbox = CircleHitbox();
+        firePower.add(hitbox);
+        add(firePower);
+        break;
       case lifeStr:
         TaskObject oneUp = TaskObject(
             animation: object1UpAnimation,
